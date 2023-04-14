@@ -6,6 +6,7 @@
 package mongo
 
 import (
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace"
 	"math"
 
 	"gopkg.in/DataDog/dd-trace-go.v1/internal"
@@ -14,6 +15,7 @@ import (
 type config struct {
 	serviceName   string
 	analyticsRate float64
+	spanOpts      []ddtrace.StartSpanOption
 }
 
 // Option represents an option that can be passed to Dial.
@@ -58,5 +60,13 @@ func WithAnalyticsRate(rate float64) Option {
 		} else {
 			cfg.analyticsRate = math.NaN()
 		}
+	}
+}
+
+// WithSpanOptions defines a set of additional ddtrace.StartSpanOption to be added
+// to spans started by the integration.
+func WithSpanOptions(opts ...ddtrace.StartSpanOption) Option {
+	return func(cfg *config) {
+		cfg.spanOpts = append(cfg.spanOpts, opts...)
 	}
 }
